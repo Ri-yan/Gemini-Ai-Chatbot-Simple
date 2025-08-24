@@ -3,7 +3,7 @@ import "dotenv/config";
 import { WebSocketServer } from "ws";
 import { GoogleGenAI, Modality } from "@google/genai";
 const API_KEY =
-  process.env.GEMINI_API_KEY || "AIzaSyAPZv-wlwMqXa8LcTzf7BOIv4nz-fOsGY4";
+  process.env.GEMINI_API_KEY;
 
 if (!API_KEY) {
   console.error(
@@ -146,3 +146,4 @@ export function initWebSocket(server) {
     });
   });
 }
+
