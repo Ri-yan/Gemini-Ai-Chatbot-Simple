@@ -1,13 +1,26 @@
 # Gemini-Ai-Chatbot-Simple
 
-## Overview
-This project is a **Node.js-based web application** that combines a backend server with real-time communication features. It uses **Express.js** to serve the frontend and **WebSockets** for live, bidirectional communication between client and server.
+## 🌐 Overview  
+This project is a **real-time AI chatbot** built with **Node.js**, **Express**, **WebSockets**, and **Google’s Gemini API**.  
 
-## Features
-- 🚀 **Express.js Server** – Handles API requests and serves static frontend files.  
-- 🔌 **WebSocket Integration** – Enables real-time updates using `wss.js`.  
-- 💻 **Frontend UI** – Located in `public/index.html`, demonstrating client interaction.  
-- 📦 **Modular Codebase** – Core logic split across `main.js`, `server.js`, and `wss.js`.  
+It enables users to chat with an intelligent assistant that supports **multilingual conversations** and can be extended with **voice input/output** using **Speech-to-Text** and **Text-to-Speech (TTS)** services.  
+
+👉 Workflow:  
+1. User sends a **text/voice message** from the frontend (`public/index.html`).  
+2. The backend (`wss.js` + `main.js`) forwards it to **Gemini API**.  
+3. Gemini generates a response.  
+4. The response is returned to the client via WebSocket and displayed (or spoken).  
+
+---
+
+## ✨ Features  
+- 🤖 **AI-powered chatbot** with Gemini API  
+- 🔌 **Real-time communication** using WebSockets  
+- 🌐 **Multilingual support** (Gemini auto-detects language)  
+- 🎤 **Voice support** via Speech-to-Text & Text-to-Speech  
+- 📦 **Modular Node.js architecture**  
+
+---
 
 ## Project Structure
 ```
