@@ -52,9 +52,15 @@ Start the server with:
 ```bash
 node server.js
 ```
+## env
+Copy Edit
+```bash
+GEMINI_API_KEY=your_api_key_here
+```
+🔑 Get your key from Google AI Studio.
 
 The application will be available at:  
-👉 `http://localhost:3000`
+👉 `http://localhost:8080`
 
 ---
 
