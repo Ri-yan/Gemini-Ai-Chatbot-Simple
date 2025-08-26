@@ -23,7 +23,8 @@ It enables users to chat with an intelligent assistant that supports **multiling
 
 ---
 ## DEMO
-https://drive.google.com/file/d/1cdtY8rJJWCAu3J9iBv5689OE6ELrHDoM/view
+[![Watch the video](https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg)](https://drive.google.com/file/d/1cdtY8rJJWCAu3J9iBv5689OE6ELrHDoM/view)
+
 
 ## Project Structure
 ```
