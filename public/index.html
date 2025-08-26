@@ -69,7 +69,7 @@
             status.innerText = "Connecting...";
             micBtn.classList.replace("bg-blue-500", "bg-red-500");
 
-            ws = new WebSocket(`ws://${location.host}`);
+            ws = new WebSocket(`wss://${location.host}`);
             ws.binaryType = "arraybuffer";
 
             ws.onopen = async () => {
