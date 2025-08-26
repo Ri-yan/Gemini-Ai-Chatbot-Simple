@@ -23,7 +23,7 @@ It enables users to chat with an intelligent assistant that supports **multiling
 
 ---
 ## DEMO
-[![Watch the video](<img width="1885" height="926" alt="image" src="https://github.com/user-attachments/assets/136caa9f-d5a3-4fd5-bd8e-1c68930f0f8c" />
+[![Watch the video](https://github.com/user-attachments/assets/136caa9f-d5a3-4fd5-bd8e-1c68930f0f8c
 )](https://drive.google.com/file/d/1cdtY8rJJWCAu3J9iBv5689OE6ELrHDoM/view)
 
 
