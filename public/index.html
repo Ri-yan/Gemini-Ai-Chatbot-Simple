@@ -19,7 +19,7 @@
         </div>
 
         <!-- Title -->
-        <h1 class="text-2xl font-semibold tracking-wide">Talk to Rev Demo</h1>
+        <h1 class="text-2xl font-semibold tracking-wide">Talk to Rev😎</h1>
 
         <!-- Mic Button -->
         <button id="micBtn"
@@ -48,19 +48,28 @@
         <p id="status" class="text-gray-400 text-sm">Click mic to start</p>
     </div>
 
+
     <script>
         const micBtn = document.getElementById("micBtn");
         const status = document.getElementById("status");
 
         let listening = false;
         let ws, audioCtx, processor, playbackCtx, audioQueueTime;
+        let activeSources = []; // track active audio nodes
+        let speaking = false;
+        function stopPlayback() {
+            audioQueueTime = playbackCtx ? playbackCtx.currentTime : 0;
+            activeSources.forEach(src => { try { src.stop(); } catch { } });
+            activeSources = [];
+            speaking = false;
+
+        }
 
         async function startConversation() {
             status.innerText = "Connecting...";
             micBtn.classList.replace("bg-blue-500", "bg-red-500");
 
-            //ws = new WebSocket("ws://localhost:8080");
-            ws = new WebSocket(`wss://${location.host}`);
+            ws = new WebSocket(`ws://${location.host}`);
             ws.binaryType = "arraybuffer";
 
             ws.onopen = async () => {
@@ -68,7 +77,10 @@
                 status.innerText = "Listening...";
 
                 // mic capture
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+                });
+
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 16000 });
                 const src = audioCtx.createMediaStreamSource(stream);
 
@@ -78,6 +90,17 @@
 
                 processor.onaudioprocess = (e) => {
                     const input = e.inputBuffer.getChannelData(0);
+                    // 🔎 VAD: detect if user starts talking while AI speaking
+                    if (speaking) {
+                        const rms = Math.sqrt(input.reduce((s, v) => s + v * v, 0) / input.length);
+                        if (rms > 0.02) {  // adjust threshold depending on mic sensitivity
+                            console.log("🚨 User started speaking → interrupt AI");
+                            stopPlayback();
+                            if (ws.readyState === WebSocket.OPEN) {
+                                ws.send(JSON.stringify("STOP")); // tell server to cut Gemini response
+                            }
+                        }
+                    }
                     const buf = new ArrayBuffer(input.length * 2);
                     const view = new DataView(buf);
                     for (let i = 0; i < input.length; i++) {
@@ -99,25 +122,28 @@
                         } catch { }
                         return;
                     }
-
+                    speaking = true; // AI is talking
+                    // decode PCM audio
                     const pcmBytes = new Int16Array(evt.data);
                     const float32 = new Float32Array(pcmBytes.length);
-                    for (let i = 0; i < pcmBytes.length; i++) {
-                        float32[i] = pcmBytes[i] / 32768;
-                    }
+                    for (let i = 0; i < pcmBytes.length; i++) float32[i] = pcmBytes[i] / 32768;
 
                     const buffer = playbackCtx.createBuffer(1, float32.length, 24000);
                     buffer.copyToChannel(float32, 0);
 
                     const src = playbackCtx.createBufferSource();
                     src.buffer = buffer;
-
-                    if (audioQueueTime < playbackCtx.currentTime) {
-                        audioQueueTime = playbackCtx.currentTime + 0.05;
-                    }
                     src.connect(playbackCtx.destination);
+                    activeSources.push(src);
+
+                    if (audioQueueTime < playbackCtx.currentTime) audioQueueTime = playbackCtx.currentTime + 0.05;
                     src.start(audioQueueTime);
                     audioQueueTime += buffer.duration;
+
+                    src.onended = () => {
+                        activeSources = activeSources.filter(s => s !== src);
+                        if (activeSources.length === 0) speaking = false;
+                    };
                 };
             };
 
@@ -139,6 +165,10 @@
         micBtn.onclick = () => {
             listening = !listening;
             if (listening) {
+                stopPlayback(); // kill current AI speech
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify("STOP")); // tell server to stop Gemini
+                }
                 startConversation();
             } else {
                 stopConversation();

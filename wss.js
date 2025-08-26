@@ -2,8 +2,7 @@
 import "dotenv/config";
 import { WebSocketServer } from "ws";
 import { GoogleGenAI, Modality } from "@google/genai";
-const API_KEY =
-  process.env.GEMINI_API_KEY;
+const API_KEY = process.env.GEMINI_API_KEY;
 
 if (!API_KEY) {
   console.error(
@@ -103,38 +102,25 @@ export function initWebSocket(server) {
 
     // Messages from the browser → forward to Gemini as realtime input.
     client.on("message", (data) => {
-      // Browser can send either:
-      // 1) Binary audio chunks (ArrayBuffer/Blob) containing raw PCM@16kHz mono 16-bit
-      // 2) JSON strings for text inputs like { type: "text", text: "hello" }
       if (Buffer.isBuffer(data)) {
-        //   session.sendRealtimeInput({
-        //     audio: {
-        //       data: data.toString("base64"),
-        //       mimeType: "audio/pcm;rate=16000",
-        //     },
-        //   });
-        const base64Audio = data.toString("base64"); // PCM 16kHz, 16-bit mono
-
         session.sendRealtimeInput({
           media: {
-            data: base64Audio,
+            data: data.toString("base64"),
             mimeType: "audio/pcm;rate=16000",
           },
         });
       } else {
         try {
           const msg = JSON.parse(data.toString());
-          if (msg?.type === "text") {
-            // Send text into the realtime stream
-            session.sendRealtimeInput({ text: msg.text });
-          } else if (msg?.type === "turnComplete") {
-            // If you want explicit turn control (usually not needed if VAD is on)
-            // session.sendClientContent({ turnComplete: true });
+          if (msg === "STOP") {
+            console.log("User barge-in, stopping AI...");
+            session.sendRealtimeInput({ turnComplete: true }); // ⬅️ halts Gemini mid-response
+            return;
           }
-        } catch (e) {
-          // ignore non-JSON strings
-          console.log(e);
-        }
+          if (msg?.type === "text") {
+            session.sendRealtimeInput({ text: msg.text });
+          }
+        } catch {}
       }
     });
 
@@ -146,4 +132,3 @@ export function initWebSocket(server) {
     });
   });
 }
-
