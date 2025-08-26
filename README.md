@@ -17,8 +17,9 @@ It enables users to chat with an intelligent assistant that supports **multiling
 - 🤖 **AI-powered chatbot** with Gemini API  
 - 🔌 **Real-time communication** using WebSockets  
 - 🌐 **Multilingual support** (Gemini auto-detects language)  
-- 🎤 **Voice support** via Speech-to-Text & Text-to-Speech  
-- 📦 **Modular Node.js architecture**  
+- 🎤 **Voice support** via Speech-to-Speech  
+- 📦 **Modular Node.js architecture**
+- 😎 **support user interrupt**
 
 ---
 ## DEMO
